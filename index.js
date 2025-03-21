@@ -1,5 +1,4 @@
 // imports
-
 const express = require('express')
 const cors = require('cors')
 const {initDb} = require('./src/utils/db-handler/mongoConnection')
@@ -12,6 +11,9 @@ const app = express();
 app.use(express.json())
 app.use(cors())
 
+// routers
+const authRoute = require('./src/routers/auth-routes/authRouter')
+app.use("/auth", authRoute)
 
 // Fire server
 const PORT = process.env.PORT || 8082;
