@@ -13,7 +13,9 @@ app.use(cors())
 
 // routers
 const authRoute = require('./src/routers/auth-routes/authRouter')
-app.use("/auth", authRoute)
+const actionRoute = require('./src/routers/action-routes/actionRouter')
+app.use("/auth", authRoute);
+app.use("/", actionRoute);
 
 // Fire server
 const PORT = process.env.PORT || 8082;
