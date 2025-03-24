@@ -1,13 +1,17 @@
 // imports
 const express = require('express')
 const cors = require('cors')
+const bodyParser = require("body-parser");
 const {initDb} = require('./src/utils/db-handler/mongoConnection')
-
+const path = require("path");
 // db connection
 initDb()
 
 // middleware stuff
 const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
+app.set("views", path.join(__dirname, "src", "views"));
+app.set("view engine", "ejs");
 app.use(express.json())
 app.use(cors())
 

@@ -2,6 +2,7 @@ const User = require('../../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 const {promisify} = require("util");
+const sendEmails = require('../../utils/email-handler/emailSender')
 
 // for usage outside this file
 exports.signToken = (email) => {
@@ -99,6 +100,62 @@ exports.login = async (req, res) => {
     }
 }
 
+// Generate Reset Password Link
+exports.resetPasswordLink = async (req, res) => {
+    try {
+        const {email} = req.body;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            return res.status(400).json({message: 'Email is required'})
+        } else if (!emailRegex.test(email)) {
+            return res.status(400).json({message: 'Invalid email format'})
+        }
+        const user = await User.findOne({email});
+        if (!user) {
+            return res.status(404).json({message: 'No user found'})
+        }
+        const link = `${process.env.ROOT_URL}/auth/reset/${user._id}`;
+        await sendEmails.sendResetPasswordLink(user.email, link);
+        return res.status(200).json({message: `Password reset email sent to : ${email}`})
+    } catch (err) {
+        return res.status(500).json({message: err})
+    }
+}
+
+// Render the password page
+exports.resetPasswordPage = async (req, res) => {
+    try {
+        const user = await User.findById(req.params._id);
+        if (!user) {
+            return res.status(400).json({message: 'User not found'})
+        }
+        res.render('reset.ejs', {
+            userId: req.params._id,
+        })
+    } catch (err) {
+        return res.status(500).json({message: err})
+    }
+}
+
+exports.handleResetPassword = async (req, res) => {
+    try {
+        const user = await User.findById(req.params._id);
+        if (!user) {
+            return res.status(404).json({message: "user not found"});
+        }
+        const newPassword = req.body.newPassword;
+        if (!newPassword) {
+            return res.status(400).json({message: 'Please provide a password'})
+        }
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+        return res.render("success.ejs");
+
+    } catch (err) {
+        return res.status(500).json({message: err})
+    }
+}
+
 // Authorization Middleware
 exports.protect = async (req, res, next) => {
     try {
@@ -106,7 +163,7 @@ exports.protect = async (req, res, next) => {
         let jwtToken;
         // If no token is provided
         if (!token) {
-            return res.status(401).json({ message: "No Token Found" });
+            return res.status(401).json({message: "No Token Found"});
         }
         if (token && token.startsWith("Bearer ")) {
             jwtToken = token.split(" ")[1];
@@ -118,12 +175,12 @@ exports.protect = async (req, res, next) => {
         );
 
         // Check if user exists
-        const user = await User.findOne({ email: decodedToken.email });
+        const user = await User.findOne({email: decodedToken.email});
 
         if (!user) {
             return res
                 .status(404)
-                .json({ message: "The user with the given token does not exist" });
+                .json({message: "The user with the given token does not exist"});
         }
 
         // Attach the user information to the request object for later use
@@ -133,6 +190,6 @@ exports.protect = async (req, res, next) => {
         // Continue to the next middleware
         next();
     } catch (error) {
-        res.status(401).json({ message: error.message });
+        res.status(401).json({message: error.message});
     }
 };
