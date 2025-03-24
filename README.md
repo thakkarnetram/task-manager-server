@@ -1,19 +1,3 @@
-# API Endpoints Documentation
-
-## Auth Routes
-- **`POST /auth/signup`** → User Signup
-- **`POST /auth/login`** → User Login
-- **`POST /auth/reset`** → Request Password Reset Link
-- **`GET /auth/reset/:_id`** → Render Reset Password Page
-- **`POST /auth/reset/:_id`** → Handle Password Reset
-
-## Task Management Routes
-- **`GET /tasks`** → Fetch All Tasks for Current User
-- **`GET /tasks/:_id`** → Fetch a Specific Task by ID
-- **`POST /tasks`** → Create a New Task
-- **`PUT /tasks/:_id`** → Update an Existing Task
-- **`DELETE /tasks/:_id`** → Delete a Task  
-
 # Environment Setup
 ### Clone the Repository
 ```bash
@@ -44,3 +28,19 @@ ROOT_URL=http://localhost:8082
 Server fired up on PORT : 8082
 Connected to DB 
 ```
+
+# API Endpoints Documentation
+
+## Auth Routes
+- **`POST /auth/signup`** → User Signup
+- **`POST /auth/login`** → User Login
+- **`POST /auth/reset`** → Request Password Reset Link
+- **`GET /auth/reset/:_id`** → Render Reset Password Page
+- **`POST /auth/reset/:_id`** → Handle Password Reset
+
+## Task Management Routes
+- **`GET /tasks`** → Fetch All Tasks for Current User
+- **`GET /tasks/:_id`** → Fetch a Specific Task by ID
+- **`POST /tasks`** → Create a New Task
+- **`PUT /tasks/:_id`** → Update an Existing Task
+- **`DELETE /tasks/:_id`** → Delete a Task  
